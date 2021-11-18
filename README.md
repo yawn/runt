@@ -1,5 +1,7 @@
 # Run template (`runt`)
 
+[![Rust](https://github.com/yawn/runt/actions/workflows/rust.yml/badge.svg)](https://github.com/yawn/runt/actions/workflows/rust.yml)
+
 `runt` is a simple commandline utility to make configuration files executable. 
 
 ## Example
