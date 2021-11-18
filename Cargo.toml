@@ -1,0 +1,17 @@
+[package]
+authors = [ "joern.barthel@kreuzwerker.de" ]
+description = "runt is a simple commandline utility to make configuration files executable"
+edition = "2021"
+license = "MIT"
+name = "runt"
+version = "0.1.0"
+
+[dev-dependencies]
+indoc = "1.0"
+
+[dependencies]
+anyhow = "1"
+clap = "3.0.0-beta.5"
+env_logger = "0.9.0"
+log = "0.4.14"
+tempfile = "3.2"
