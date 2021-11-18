@@ -42,12 +42,6 @@ This env is then used to `exec`ute the head.
 
 `runt` has very few configuration options:
 
-* `-t, --env-for-tail` (default: `$RUNT_TEMPLATE) specifies the tail location
+* `-t, --env-for-tail` (default: `$RUNT_TAIL`) specifies the tail location
 * `-k, --keep-tail` will flag the temporary tail file as "do not delete"
 * `-v, --verbose` will output some debug information while running
-
-## Installation
-
-On Mac OS with `brew` run `brew tap yawn/taps` and the `brew install yawn/taps/runt`.
-
-Currently no other platforms are supported. Feel free to open a PR if interested.
