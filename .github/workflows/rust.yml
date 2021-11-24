@@ -10,12 +10,30 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  Build:
     runs-on: ubuntu-latest
-
+    env:
+      CACHE_BUSTER: 20211021-00
+      RUST_BACKTRACE: full
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/.crates*
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}-${{ env.CACHE_BUSTER }}
+    - name: Cache build
+      uses: actions/cache@v2
+      with:
+        path: |
+          ./target
+        key: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}-${{ env.CACHE_BUSTER }}
     - name: Build
       run: cargo build --verbose
     - name: Run tests
