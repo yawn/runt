@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    # trigger manually for tmate support on failure with "gh workflow run rust.yml"; abort with touch /continue
+    branches: [ main ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -14,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CACHE_BUSTER: 20211021-00
-      RUST_BACKTRACE: full
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -38,3 +40,9 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && failure() }}
+      timeout-minutes: 60
+      with:
+        limit-access-to-actor: true

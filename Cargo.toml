@@ -4,10 +4,15 @@ description = "runt is a simple commandline utility to make configuration files 
 edition = "2021"
 license = "MIT"
 name = "runt"
-version = "0.1.0"
+version = "1.0.0"
 
 [dev-dependencies]
+assert_cmd = "2.0.2"
+assert_fs = "1.0.6"
+escargot = "0.5.6"
 indoc = "1.0.3"
+lazy_static = "1.4.0"
+predicates = "2.1.0"
 
 [dependencies]
 anyhow = "1.0.48"
