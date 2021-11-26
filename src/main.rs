@@ -6,6 +6,10 @@ use std::io::{copy, BufRead, BufReader, Error, Read, Seek};
 use std::os::unix::prelude::CommandExt;
 use std::process::Command;
 
+mod build {
+    include!(concat!(env!("OUT_DIR"), "/built.rs"));
+}
+
 #[cfg(test)]
 mod tests {
     use indoc::indoc;
@@ -164,7 +168,10 @@ fn config() -> anyhow::Result<(Config, Vec<String>)> {
     use clap::{app_from_crate, AppSettings, Arg};
     include_str!("../Cargo.toml");
 
+    let version = build::PKG_VERSION.to_owned() + " (" + build::GIT_VERSION.unwrap() + ")";
+
     let matches = app_from_crate!()
+        .long_version(version.as_ref())
         .setting(AppSettings::TrailingVarArg)
         .arg("-k, --keep 'Keep the temporary tail file'")
         .arg(

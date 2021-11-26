@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Run tests
+        run: cargo test
+      - name: Build
+        run: cargo build --release
+      - name: Compress
+        run: upx --best --lzma target/release/runt
+      - name: Prepare release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create $GITHUB_REF_NAME --draft target/release/runt

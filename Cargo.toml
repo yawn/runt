@@ -1,10 +1,20 @@
 [package]
 authors = [ "joern.barthel@kreuzwerker.de" ]
+build = "build.rs"
 description = "runt is a simple commandline utility to make configuration files executable"
 edition = "2021"
 license = "MIT"
 name = "runt"
 version = "1.0.0"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "z" # optimize for size
+panic = "abort"
+
+[build-dependencies]
+built = { version = "0.5.1", features = [ "git2" ] }
 
 [dev-dependencies]
 assert_cmd = "2.0.2"

@@ -1,12 +1,16 @@
-name: Rust
+name: CI
 
 on:
   push:
     branches: [ main ]
+    tags-ignore:
+      - '**'
   pull_request:
     branches: [ main ]
+    tags-ignore:
+      - '**'
   workflow_dispatch:
-    # trigger manually for tmate support on failure with "gh workflow run rust.yml"; abort with touch /continue
+    # trigger manually for tmate support on failure with "gh workflow run ci.yml"; abort with touch /continue
     branches: [ main ]
 
 env:
@@ -20,6 +24,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Cache dependencies
       uses: actions/cache@v2
       with:
@@ -37,9 +43,9 @@ jobs:
           ./target
         key: ${{ runner.os }}-build-${{ hashFiles('Cargo.lock') }}-${{ env.CACHE_BUSTER }}
     - name: Build
-      run: cargo build --verbose
+      run: cargo build
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       if: ${{ github.event_name == 'workflow_dispatch' && failure() }}
