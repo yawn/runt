@@ -9,20 +9,73 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  Build:
+  BuildLinux:
+    name: Build on Linux
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [ x86_64-unknown-linux-gnu ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Add target
+        run: rustup target add ${{ matrix.target }}
       - name: Run tests
         run: cargo test
       - name: Build
-        run: cargo build --release
+        run: cargo build --target ${{ matrix.target }} --release
       - name: Compress
-        run: upx --best --lzma target/release/runt
-      - name: Prepare release
+        run: upx --best --lzma target/${{ matrix.target}}/release/runt
+      - name: Rename
+        run: mv target/${{ matrix.target}}/release/runt target/runt-${{ matrix.target }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: runt-${{ matrix.target}}
+          path: target/runt-${{ matrix.target}}
+          retention-days: 1
+  BuildMac:
+    name: Build on macOS
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target: [ aarch64-apple-darwin, x86_64-apple-darwin ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Add target
+        run: rustup target add ${{ matrix.target }}
+      - name: Run tests
+        run: cargo test
+      - name: Build
+        run: cargo build --target ${{ matrix.target }} --release
+      - name: Install UPX
+        run: brew install upx
+      - name: Compress
+        run: upx --best --lzma target/${{ matrix.target}}/release/runt
+      - name: Rename
+        run: mv target/${{ matrix.target}}/release/runt target/runt-${{ matrix.target }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: runt-${{ matrix.target}}
+          path: target/runt-${{ matrix.target}}
+          retention-days: 1
+  Release:
+    needs: [ BuildLinux, BuildMac ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout # required for release
+        uses: actions/checkout@v2
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+      - name: Generate checksums
+        run: find artifacts -type f | xargs shasum -a256
+      - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create $GITHUB_REF_NAME --draft target/release/runt
+        run: gh release create $GITHUB_REF_NAME --draft artifacts/**/*
